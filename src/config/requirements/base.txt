@@ -1,0 +1,22 @@
+# FastAPI
+fastapi==0.95.2
+
+# Webserver
+uvicorn==0.22.0
+
+# Database
+sqlmodel==0.0.8
+asyncpg==0.27.0
+alembic==1.11.1
+
+# Environment
+python-dotenv==1.0.0
+
+# Cryptography
+passlib==1.7.4
+bcrypt==4.0.1
+python-jose==3.3.0
+
+# Utilities
+requests==2.31.0
+sentry-sdk[fastapi]==1.24.0
