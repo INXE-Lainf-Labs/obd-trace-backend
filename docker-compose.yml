@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+  backend:
+    platform: linux/amd64
+    container_name: backend
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "8000:8000"
+    environment:
+      ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+      backend-init:
+        condition: service_completed_successfully
+
+  backend-init:
+    platform: linux/amd64
+    container_name: backend-init
+    build:
+      context: .
+      target: dev
+    command: ["sh", "./docker/api-entrypoint-scripts/docker-entrypoint.sh", "migrate"]
+    volumes:
+      - .:/usr/src/app
+    environment:
+      ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    container_name: database
+    image: postgres:14.5
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./docker/db-entrypoint-scripts:/docker-entrypoint-initdb.d/
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: app,test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg-data:
