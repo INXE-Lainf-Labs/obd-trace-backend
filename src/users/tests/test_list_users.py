@@ -5,7 +5,7 @@ import pytest
 from src.core.models import UserRoleEnum
 
 
-class TestCreateUser:
+class TestGetUser:
     @pytest.mark.asyncio
     async def test_list_users_successful(self, client, admin_token, admin_payload):
         test_token = await admin_token()
