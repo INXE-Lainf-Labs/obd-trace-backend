@@ -7,7 +7,7 @@ RUN python -m pip install -U pip && pip install -r src/config/requirements.txt
 
 FROM builder as dev
 RUN pip install -r src/config/requirements/dev.txt
-ENTRYPOINT ["sh", "src/config/docker-entrypoint.sh"]
+ENTRYPOINT ["sh", "docker/api-entrypoint-scripts/docker-entrypoint.sh"]
 
 FROM builder as prod
-ENTRYPOINT ["sh", "src/config/docker-entrypoint.sh"]
+ENTRYPOINT ["sh", "docker/api-entrypoint-scripts/docker-entrypoint.sh"]

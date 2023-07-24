@@ -37,6 +37,9 @@ test:
 coverage-test:
 	docker exec -it backend pytest --cov=./ --cov-report=xml
 
+coverage-test-local:
+	pytest --cov=./ --cov-report=html
+
 lint:
 	black --check ./src
 
