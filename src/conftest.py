@@ -17,6 +17,7 @@ from src.config.database.setup import get_db_session
 from src.core.models import User, UserRoleEnum, Customer, UserRole
 from src.main import app
 from src.users.service import create_customer
+from src.vehicles.models import Vehicle
 
 load_dotenv("src/config/.env")
 
@@ -158,3 +159,28 @@ def expired_token(admin):
         return expired_token
 
     return _expired_token
+
+
+@pytest.fixture
+def vehicle_payload():
+    return {
+        "id": 1,
+        "brand": "chevrolet",
+        "model": "corsa",
+        "color": "black",
+        "year": "2007",
+    }
+
+
+@pytest_asyncio.fixture
+async def vehicle(db_session, vehicle_payload):
+    test_vehicle = Vehicle(
+        brand=vehicle_payload["brand"],
+        model=vehicle_payload["model"],
+        color=vehicle_payload["color"],
+        year=vehicle_payload["year"],
+    )
+    db_session.add(test_vehicle)
+    await db_session.commit()
+    await db_session.refresh(test_vehicle)
+    return test_vehicle

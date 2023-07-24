@@ -4,34 +4,24 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config.database.setup import get_db_session
-from src.core.exceptions import InvalidUsername, Unauthorized, Forbidden
-from src.core.middlewares.authentication_middleware import validate_token
+from src.core.exceptions import InvalidUsername
 from src.core.models import User, Customer, UserRoleEnum, Employee
 from src.users.schemas import NewCustomer, NewEmployee
 
 
-async def check_authorization(authorization: str) -> bool:
-    if authorization is None:
-        raise Unauthorized()
-
-    token = authorization.split()[1]
-    token_user = await validate_token(token)
-    if token_user.role is not UserRoleEnum.Admin.value:
-        raise Forbidden()
-
-    return True
-
-
 async def get_users(db_session: AsyncSession) -> list[User]:
     result = await db_session.scalars(select(User))
-    user: list[User] = result.all()
-    return user
+    return result.all()
 
 
 async def get_user_by_username(username: str, db_session: AsyncSession) -> User | None:
     result = await db_session.execute(select(User).where(User.username == username))
-    user: User = result.scalar_one_or_none()
-    return user
+    return result.scalar_one_or_none()
+
+
+async def get_user_by_id(user_id: int, db_session: AsyncSession) -> User | None:
+    result = await db_session.execute(select(User).where(User.id == user_id))
+    return result.scalar_one_or_none()
 
 
 async def create_user(

@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 
 from src.core.exceptions import Unauthorized, Forbidden
-from src.core.models import User
+from src.core.models import User, UserRoleEnum
 
 load_dotenv("src/config/.env")
 
@@ -51,3 +51,15 @@ async def create_token(user_id: int, username: str, role: int):
         algorithm=JWT_ALGORITHM,
     )
     return access_token
+
+
+async def check_authorization(authorization: str) -> bool:
+    if authorization is None:
+        raise Unauthorized()
+
+    token = authorization.split()[1]
+    token_user = await validate_token(token)
+    if token_user.role is not UserRoleEnum.Admin.value:
+        raise Forbidden()
+
+    return True

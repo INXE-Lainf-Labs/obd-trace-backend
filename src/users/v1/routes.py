@@ -3,22 +3,18 @@ from typing import Annotated
 
 from fastapi import Depends, APIRouter, Header
 from fastapi.security import OAuth2PasswordRequestForm
-from passlib.context import CryptContext
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config.database.setup import get_db_session
+from src.core.middlewares.authentication_middleware import check_authorization
 from src.users.schemas import NewCustomer, NewEmployee, ResponseUser
 from src.users.service import (
     get_users,
-    check_authorization,
     create_customer,
     create_employee,
 )
 
 users_v1_router = APIRouter(prefix="/v1/users")
-context = CryptContext(
-    schemes=["sha512_crypt"], deprecated="auto", default="sha512_crypt"
-)
 
 
 @users_v1_router.get("/", response_model=list[ResponseUser])
