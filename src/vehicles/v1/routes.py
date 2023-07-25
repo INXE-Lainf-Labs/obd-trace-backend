@@ -50,20 +50,21 @@ async def post_vehicle(
 ):
     is_authorized = await check_authorization(authorization)
     if is_authorized:
-        customer = await create_vehicle(
+        vehicle = await create_vehicle(
             brand=vehicle.brand,
             model=vehicle.model,
             color=vehicle.color,
             year=vehicle.year,
             db_session=db_session,
         )
-        return customer
+        return vehicle
 
 
 @vehicles_v1_router.post(
     "/customer/{vehicle_id}",
     response_model=ResponseCustomerVehicle,
     status_code=HTTPStatus.CREATED,
+    summary="Create a Customer relation to an existent Vehicle",
 )
 async def post_customer_vehicle(
     customer_vehicle: CustomerVehicle,
@@ -73,20 +74,21 @@ async def post_customer_vehicle(
 ):
     is_authorized = await check_authorization(authorization)
     if is_authorized:
-        customer = await create_customer_vehicle(
+        new_customer_vehicle = await create_customer_vehicle(
             vin=customer_vehicle.vin,
             plate_code=customer_vehicle.plate_code,
             user_id=customer_vehicle.customer_id,
             vehicle_id=vehicle_id,
             db_session=db_session,
         )
-        return customer
+        return new_customer_vehicle
 
 
 @vehicles_v1_router.post(
     "/customer/",
     response_model=ResponseCustomerVehicle,
     status_code=HTTPStatus.CREATED,
+    summary="Create a Customer relation to a new Vehicle",
 )
 async def post_vehicle_and_customer_vehicle(
     customer_vehicle: CustomerVehicle,
@@ -95,7 +97,7 @@ async def post_vehicle_and_customer_vehicle(
 ):
     is_authorized = await check_authorization(authorization)
     if is_authorized:
-        customer = await create_vehicle_and_customer_vehicle(
+        new_customer_vehicle = await create_vehicle_and_customer_vehicle(
             vin=customer_vehicle.vin,
             plate_code=customer_vehicle.plate_code,
             user_id=customer_vehicle.customer_id,
@@ -105,4 +107,4 @@ async def post_vehicle_and_customer_vehicle(
             year=customer_vehicle.year,
             db_session=db_session,
         )
-        return customer
+        return new_customer_vehicle

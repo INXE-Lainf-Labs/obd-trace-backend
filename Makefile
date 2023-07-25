@@ -61,4 +61,4 @@ new-feature:
 	@touch ./src/$(FEAT_NAME)/schemas.py
 	@touch ./src/$(FEAT_NAME)/services.py
 	@touch ./src/$(FEAT_NAME)/models.py
-	@Done!
+	@echo Done!
