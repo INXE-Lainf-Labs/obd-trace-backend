@@ -3,19 +3,20 @@ from datetime import datetime, timedelta
 
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient
 from dotenv import load_dotenv
+from httpx import AsyncClient
 from jose import jwt
 from passlib.handlers.pbkdf2 import pbkdf2_sha512
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.auth.services import signin_user
 from src.config.database.setup import get_db_session
-from src.core.models import User, UserRoleEnum, Customer, UserRole
+from src.core.models import User, UserRoleEnum, UserRole
 from src.main import app
+from src.services.models import Service
 from src.users.service import create_customer
 from src.vehicles.models import Vehicle
 
@@ -184,3 +185,31 @@ async def vehicle(db_session, vehicle_payload):
     await db_session.commit()
     await db_session.refresh(test_vehicle)
     return test_vehicle
+
+
+@pytest.fixture
+def service_payload():
+    return {
+        "id": 1,
+        "name": "Oil change",
+        "price": 80.00,
+        "description": "Drain motor oil and replace it",
+        "image": "https://images.wisegeek.com/oil-change.jpg",
+        "estimated_time": timedelta(hours=1).seconds,
+        "category": "maintenance",
+    }
+
+
+@pytest_asyncio.fixture
+async def service(db_session, service_payload):
+    test_service = Service(
+        name=service_payload["name"],
+        price=service_payload["price"],
+        description=service_payload["description"],
+        image=service_payload["image"],
+        estimated_time=service_payload["estimated_time"],
+    )
+    db_session.add(test_service)
+    await db_session.commit()
+    await db_session.refresh(test_service)
+    return test_service

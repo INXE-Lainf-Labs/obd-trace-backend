@@ -18,6 +18,7 @@ class ResponseVehicle(BaseModel):
 
 
 class CustomerVehicle(BaseModel):
+    id: int | None
     vin: str
     plate_code: str
     customer_id: int

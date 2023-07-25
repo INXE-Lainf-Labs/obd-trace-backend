@@ -1,19 +1,16 @@
-import os
 import asyncio
+import os
 from logging.config import fileConfig
 
+from alembic import context
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import SQLModel
 
-from alembic import context
-
 # Import models here if using SQLite in development environment. Otherwise, use migration to set up the database.
-from src.core.models import User, UserRole, Customer, Address, Employee
-
-from dotenv import load_dotenv
 
 load_dotenv()
 SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", None)
