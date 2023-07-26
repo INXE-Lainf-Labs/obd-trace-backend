@@ -1,5 +1,5 @@
-import os
 from datetime import datetime, timedelta
+from os import getenv
 
 import pytest
 import pytest_asyncio
@@ -14,7 +14,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.auth.services import signin_user
 from src.config.database.setup import get_db_session
-from src.core.models import User, UserRoleEnum, UserRole
+from src.core.models import User
 from src.main import app
 from src.services.models import Service
 from src.users.service import create_customer
@@ -22,12 +22,16 @@ from src.vehicles.models import Vehicle
 
 load_dotenv("src/config/.env")
 
-JWT_EXPIRATION_DAYS = os.getenv("JWT_EXPIRATION_DAYS")
-JWT_SECRET = os.getenv("JWT_SECRET")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+ROLES = getenv("ROLES")
+ADMIN_ROLE = ROLES[0]
+CUSTOMER_ROLE = ROLES[1]
+EMPLOYEE_ROLE = ROLES[2]
+JWT_EXPIRATION_DAYS = getenv("JWT_EXPIRATION_DAYS")
+JWT_SECRET = getenv("JWT_SECRET")
+JWT_ALGORITHM = getenv("JWT_ALGORITHM")
 
-TEST_SQLALCHEMY_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", None)
-ENVIRONMENT = os.environ.get("ENV", None)
+TEST_SQLALCHEMY_DATABASE_URL = getenv("TEST_DATABASE_URL", None)
+ENVIRONMENT = getenv("ENV", None)
 
 db_logs = "debug" if ENVIRONMENT == "development" else True
 
@@ -57,13 +61,8 @@ async def db_session(db_connection) -> AsyncSession:
 
 @pytest_asyncio.fixture
 async def setup_db(db_session):
-    user_role_admin = UserRole(id=UserRoleEnum.Admin.value, role="admin")
-    user_role_customer = UserRole(id=UserRoleEnum.Customer.value, role="customer")
-    user_role_employee = UserRole(id=UserRoleEnum.Employee.value, role="employee")
-    db_session.add(user_role_admin)
-    db_session.add(user_role_customer)
-    db_session.add(user_role_employee)
-    await db_session.commit()
+    # Add database setup instructions here if necessary.
+    pass
 
 
 @pytest_asyncio.fixture
@@ -73,6 +72,21 @@ async def client(db_session, setup_db) -> AsyncClient:
         app=app, base_url="http://test", headers={"X-User-Fingerprint": "Test"}
     ) as client:
         yield client
+
+
+@pytest.fixture
+def admin_role():
+    return ADMIN_ROLE
+
+
+@pytest.fixture
+def customer_role():
+    return CUSTOMER_ROLE
+
+
+@pytest.fixture
+def employee_role():
+    return EMPLOYEE_ROLE
 
 
 @pytest.fixture
@@ -108,7 +122,7 @@ async def admin(db_session, admin_payload):
     admin = User(
         username=admin_payload["username"],
         hashed_password=hashed_password,
-        role=UserRoleEnum.Admin.value,
+        role=ADMIN_ROLE,
     )
     db_session.add(admin)
     await db_session.commit()

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class NewCustomer(BaseModel):
     id: int
-    role: int
+    role: str
     username: str
 
 
@@ -18,4 +18,4 @@ class ResponseUser(BaseModel):
     first_name: str | None
     last_name: str | None
     is_active: bool
-    role: int
+    role: str

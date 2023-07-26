@@ -1,3 +1,5 @@
+from os import getenv
+
 from fastapi.params import Depends
 from passlib.hash import pbkdf2_sha512
 from sqlmodel import select
@@ -5,8 +7,12 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config.database.setup import get_db_session
 from src.core.exceptions import InvalidUsername
-from src.core.models import User, Customer, UserRoleEnum, Employee
+from src.core.models import User, Customer, Employee
 from src.users.schemas import NewCustomer, NewEmployee
+
+ROLES = getenv("ROLES")
+EMPLOYEE_ROLE = ROLES[2]
+CUSTOMER_ROLE = ROLES[1]
 
 
 async def get_users(db_session: AsyncSession) -> list[User]:
@@ -28,7 +34,7 @@ async def create_user(
     username: str,
     password: str,
     db_session: AsyncSession,
-    role: int = UserRoleEnum.Customer.value,
+    role: str = CUSTOMER_ROLE,
 ) -> User:
     user = await get_user_by_username(username, db_session)
     if user is not None:
@@ -48,7 +54,7 @@ async def create_customer(
     user = await create_user(
         username=username,
         password=password,
-        role=UserRoleEnum.Customer.value,
+        role=CUSTOMER_ROLE,
         db_session=db_session,
     )
 
@@ -65,7 +71,7 @@ async def create_employee(
     user = await create_user(
         username=username,
         password=password,
-        role=UserRoleEnum.Employee.value,
+        role=EMPLOYEE_ROLE,
         db_session=db_session,
     )
 

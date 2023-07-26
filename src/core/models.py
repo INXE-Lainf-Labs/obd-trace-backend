@@ -1,18 +1,12 @@
-from enum import Enum
+from os import getenv
 
+from dotenv import load_dotenv
 from sqlmodel import SQLModel, Field
 
+load_dotenv("src/config/.env")
 
-class UserRoleEnum(Enum):
-    Admin = 1
-    Customer = 2
-    Employee = 3
-
-
-class UserRole(SQLModel, table=True):
-    __tablename__ = "user_role"
-    id: int = Field(default=None, primary_key=True)
-    role: str = Field(unique=True)
+ROLES = getenv("ROLES")
+CUSTOMER_ROLE = ROLES[1]
 
 
 class User(SQLModel, table=True):
@@ -21,10 +15,9 @@ class User(SQLModel, table=True):
     hashed_password: str | None = Field(nullable=False)
     first_name: str = Field(default=None)
     last_name: str = Field(default=None)
-    is_active: bool = Field(nullable=False, default=True)
-    role: int = Field(
-        nullable=False, default=UserRoleEnum.Customer.value, foreign_key="user_role.id"
-    )
+    is_active: bool | None = Field(nullable=False, default=True)
+    role: str = Field(nullable=False, default=CUSTOMER_ROLE)
+    address_id: int | None = Field(nullable=True, foreign_key="address.id")
 
 
 class Address(SQLModel, table=True):

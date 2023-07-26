@@ -3,12 +3,12 @@ from http import HTTPStatus
 
 import pytest
 
-from src.core.models import UserRoleEnum
-
 
 class TestCreateUser:
     @pytest.mark.asyncio
-    async def test_create_customer_successful(self, client, user_payload, admin_token):
+    async def test_create_customer_successful(
+        self, client, customer_role, user_payload, admin_token
+    ):
         test_token = await admin_token()
         header = {"Authorization": f"Bearer {test_token}"}
         response = await client.post(
@@ -17,7 +17,7 @@ class TestCreateUser:
         assert response.status_code == HTTPStatus.CREATED
         assert response.json() == {
             "id": 2,
-            "role": UserRoleEnum.Customer.value,
+            "role": customer_role,
             "username": user_payload["username"],
         }
 
