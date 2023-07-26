@@ -1,17 +1,19 @@
 from datetime import datetime, timedelta
+from os import getenv
 
 from dotenv import load_dotenv
-from jose import JWTError, jwt, ExpiredSignatureError
-from os import getenv
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
 
 from src.core.exceptions import Unauthorized, Forbidden
-from src.core.models import User, UserRoleEnum
+from src.core.models import User
 
 load_dotenv("src/config/.env")
 
+ROLES = getenv("ROLES")
+ADMIN_ROLE = ROLES[0]
 JWT_SECRET = getenv("JWT_SECRET")
 JWT_ALGORITHM = getenv("JWT_ALGORITHM")
 JWT_EXPIRATION_DAYS = getenv("JWT_EXPIRATION_DAYS")
@@ -38,7 +40,7 @@ async def validate_token(access_token: str = Depends(oauth2_scheme)) -> User:
         raise Unauthorized()
 
 
-async def create_token(user_id: int, username: str, role: int):
+async def create_token(user_id: int, username: str, role: str):
     expire = datetime.utcnow() + timedelta(days=int(JWT_EXPIRATION_DAYS))
     access_token = jwt.encode(
         {
@@ -59,7 +61,7 @@ async def check_authorization(authorization: str) -> bool:
 
     token = authorization.split()[1]
     token_user = await validate_token(token)
-    if token_user.role is not UserRoleEnum.Admin.value:
+    if token_user.role is not ADMIN_ROLE:
         raise Forbidden()
 
     return True
