@@ -7,7 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.config.database.setup import get_db_session
 from src.core.middlewares.authentication_middleware import check_authorization
 from src.services.models import Service
-from src.services.schemas import ResponseService
+from src.services.schemas import ServiceResponse
 from src.services.services import (
     get_services,
     get_service_by_id,
@@ -20,7 +20,7 @@ services_v1_router = APIRouter(prefix="/v1/services")
 
 
 @services_v1_router.get("/", response_model=list[Service], summary="Get all Services")
-async def list_vehicles(
+async def list_services(
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await get_services(db_session)
@@ -29,7 +29,7 @@ async def list_vehicles(
 @services_v1_router.get(
     "/{service_id}/",
     response_model=Service,
-    summary="Get service details fora a given id",
+    summary="Get service details for a given id",
 )
 async def get_service(
     service_id: Annotated[int, Path(title="The ID of the service", ge=0, le=1000)],
@@ -40,7 +40,7 @@ async def get_service(
 
 @services_v1_router.post(
     "/",
-    response_model=ResponseService,
+    response_model=ServiceResponse,
     status_code=HTTPStatus.CREATED,
     summary="Create new service",
 )
@@ -65,7 +65,7 @@ async def post_service(
 
 @services_v1_router.put(
     "/{service_id}/",
-    response_model=ResponseService,
+    response_model=ServiceResponse,
     status_code=HTTPStatus.OK,
     summary="Update a service",
 )

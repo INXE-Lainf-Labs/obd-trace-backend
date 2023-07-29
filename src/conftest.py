@@ -16,13 +16,14 @@ from src.auth.services import signin_user
 from src.config.database.setup import get_db_session
 from src.core.models import User
 from src.main import app
+from src.orders.models import Order
 from src.services.models import Service
 from src.users.service import create_customer
-from src.vehicles.models import Vehicle
+from src.vehicles.models import Vehicle, CustomerVehicle
 
 load_dotenv("src/config/.env")
 
-ROLES = getenv("ROLES")
+ROLES = getenv("ROLES").split(",")
 ADMIN_ROLE = ROLES[0]
 CUSTOMER_ROLE = ROLES[1]
 EMPLOYEE_ROLE = ROLES[2]
@@ -201,6 +202,31 @@ async def vehicle(db_session, vehicle_payload):
     return test_vehicle
 
 
+@pytest_asyncio.fixture
+async def customer_vehicle_payload(customer):
+    test_customer = await customer()
+    return {
+        "vin": "TESTVIN1234",
+        "plate_code": "",
+        "customer_id": test_customer.id,
+    }
+
+
+@pytest_asyncio.fixture
+async def customer_vehicle(db_session, vehicle, vehicle_payload, customer):
+    test_customer = await customer()
+    test_customer_vehicle = CustomerVehicle(
+        # customer_id=test_customer.id, vehicle_id=vehicle_payload["id"], plate_code=""
+        customer_id=test_customer.id,
+        vehicle_id=vehicle.id,
+        plate_code="",
+    )
+    db_session.add(test_customer_vehicle)
+    await db_session.commit()
+    await db_session.refresh(test_customer_vehicle)
+    return test_customer_vehicle
+
+
 @pytest.fixture
 def service_payload():
     return {
@@ -227,3 +253,36 @@ async def service(db_session, service_payload):
     await db_session.commit()
     await db_session.refresh(test_service)
     return test_service
+
+
+@pytest.fixture
+def order_payload():
+    start_date = datetime.now() + timedelta(days=2)
+    estimated_time = start_date + timedelta(hours=1)
+    return {
+        "id": 1,
+        "customer_id": 1,
+        "customer_vehicle_ids": [1],
+        "service_ids": [1],
+        "employee_ids": [],
+        "start_date": start_date,
+        "estimated_time": estimated_time,
+        "status": "UNDER_REVIEW",
+    }
+
+
+@pytest_asyncio.fixture
+async def order(db_session, customer, service, customer_vehicle, order_payload):
+    test_order = Order(
+        customer_id=order_payload["customer_id"],
+        customer_vehicle_ids=order_payload["customer_vehicle_ids"],
+        service_ids=order_payload["service_ids"],
+        employee_ids=order_payload["employee_ids"],
+        start_date=order_payload["start_date"],
+        estimated_time=order_payload["estimated_time"],
+        status=order_payload["status"],
+    )
+    db_session.add(test_order)
+    await db_session.commit()
+    await db_session.refresh(test_order)
+    return test_order

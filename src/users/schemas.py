@@ -12,7 +12,7 @@ class NewEmployee(BaseModel):
     username: str
 
 
-class ResponseUser(BaseModel):
+class UserResponse(BaseModel):
     id: int
     username: str
     first_name: str | None

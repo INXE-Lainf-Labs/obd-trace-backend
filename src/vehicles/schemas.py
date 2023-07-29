@@ -9,7 +9,7 @@ class Vehicle(BaseModel):
     year: str
 
 
-class ResponseVehicle(BaseModel):
+class VehicleResponse(BaseModel):
     id: int
     model: str | None
     brand: str | None
@@ -28,7 +28,7 @@ class CustomerVehicle(BaseModel):
     year: str | None
 
 
-class ResponseCustomerVehicle(BaseModel):
+class CustomerVehicleResponse(BaseModel):
     vin: str
     plate_code: str
     customer_id: int

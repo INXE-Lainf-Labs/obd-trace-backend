@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ResponseService(BaseModel):
+class ServiceResponse(BaseModel):
     id: int
     name: str
     description: str
