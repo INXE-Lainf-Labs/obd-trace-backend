@@ -2,13 +2,13 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.core.exceptions import CustomerNotFoundException
-from src.users.service import get_user_by_id
+from src.users.service import get_customer_by_id
 from src.vehicles.exceptions import (
     VehicleAlreadyExistsException,
     VehicleNotFoundException,
 )
 from src.vehicles.models import Vehicle, CustomerVehicle
-from src.vehicles.schemas import ResponseCustomerVehicle
+from src.vehicles.schemas import CustomerVehicleResponse
 
 
 async def get_vehicles(db_session: AsyncSession) -> list[Vehicle]:
@@ -61,55 +61,65 @@ async def get_vehicle(
 async def create_customer_vehicle(
     vin: str,
     plate_code: str | None,
-    user_id: int,
+    customer_id: int,
     vehicle_id: int,
     db_session: AsyncSession,
-) -> ResponseCustomerVehicle:
+) -> CustomerVehicleResponse:
     registered_vehicle = await get_vehicle_by_id(
         vehicle_id=vehicle_id, db_session=db_session
     )
     if registered_vehicle is None:
         raise VehicleNotFoundException()
 
-    registered_user = await get_user_by_id(user_id=user_id, db_session=db_session)
-    if registered_user is None:
+    registered_customer = await get_customer_by_id(
+        customer_id=customer_id, db_session=db_session
+    )
+    if registered_customer is None:
         raise CustomerNotFoundException()
 
     customer_vehicle = CustomerVehicle(
-        vin=vin, plate_code=plate_code, user_id=user_id, vehicle_id=vehicle_id
+        vin=vin, plate_code=plate_code, customer_id=customer_id, vehicle_id=vehicle_id
     )
     db_session.add(customer_vehicle)
     await db_session.commit()
     await db_session.refresh(customer_vehicle)
-    return ResponseCustomerVehicle(
-        vin=vin, plate_code=plate_code, customer_id=user_id, vehicle_id=vehicle_id
+    return CustomerVehicleResponse(
+        vin=vin, plate_code=plate_code, customer_id=customer_id, vehicle_id=vehicle_id
     )
 
 
 async def create_vehicle_and_customer_vehicle(
     vin: str,
     plate_code: str | None,
-    user_id: int,
+    customer_id: int,
     brand: str,
     model: str,
     color: str,
     year: str,
     db_session: AsyncSession,
-) -> ResponseCustomerVehicle:
+) -> CustomerVehicleResponse:
     new_vehicle = await create_vehicle(
         brand=brand, model=model, color=color, year=year, db_session=db_session
     )
 
-    registered_user = await get_user_by_id(user_id=user_id, db_session=db_session)
-    if registered_user is None:
+    registered_customer = await get_customer_by_id(
+        customer_id=customer_id, db_session=db_session
+    )
+    if registered_customer is None:
         raise CustomerNotFoundException()
 
     customer_vehicle = CustomerVehicle(
-        vin=vin, plate_code=plate_code, user_id=user_id, vehicle_id=new_vehicle.id
+        vin=vin,
+        plate_code=plate_code,
+        customer_id=customer_id,
+        vehicle_id=new_vehicle.id,
     )
     db_session.add(customer_vehicle)
     await db_session.commit()
     await db_session.refresh(customer_vehicle)
-    return ResponseCustomerVehicle(
-        vin=vin, plate_code=plate_code, customer_id=user_id, vehicle_id=new_vehicle.id
+    return CustomerVehicleResponse(
+        vin=vin,
+        plate_code=plate_code,
+        customer_id=customer_id,
+        vehicle_id=new_vehicle.id,
     )

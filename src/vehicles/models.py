@@ -14,7 +14,7 @@ class CustomerVehicle(SQLModel, table=True):
     id: int | None = Field(
         unique=True, nullable=False, default=None, primary_key=True, index=True
     )
-    vin: str = Field(unique=True, nullable=False, default=None)
+    vin: str | None = Field(unique=True, nullable=True, default="")
     plate_code: str = Field(nullable=False, default="")
-    user_id: int = Field(nullable=False, default=None, foreign_key="user.id")
+    customer_id: int = Field(nullable=False, default=None, foreign_key="customer.id")
     vehicle_id: int = Field(nullable=False, default=None, foreign_key="vehicle.id")

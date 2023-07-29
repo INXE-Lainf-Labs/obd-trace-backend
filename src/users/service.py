@@ -10,7 +10,7 @@ from src.core.exceptions import InvalidUsername
 from src.core.models import User, Customer, Employee
 from src.users.schemas import NewCustomer, NewEmployee
 
-ROLES = getenv("ROLES")
+ROLES = getenv("ROLES").split(",")
 EMPLOYEE_ROLE = ROLES[2]
 CUSTOMER_ROLE = ROLES[1]
 
@@ -27,6 +27,15 @@ async def get_user_by_username(username: str, db_session: AsyncSession) -> User 
 
 async def get_user_by_id(user_id: int, db_session: AsyncSession) -> User | None:
     result = await db_session.execute(select(User).where(User.id == user_id))
+    return result.scalar_one_or_none()
+
+
+async def get_customer_by_id(
+    customer_id: int, db_session: AsyncSession
+) -> Customer | None:
+    result = await db_session.execute(
+        select(Customer).where(Customer.id == customer_id)
+    )
     return result.scalar_one_or_none()
 
 
@@ -58,7 +67,7 @@ async def create_customer(
         db_session=db_session,
     )
 
-    customer = Customer(user_id=user.id)
+    customer = Customer(id=user.id)
     db_session.add(customer)
     await db_session.commit()
     await db_session.refresh(customer)
@@ -75,7 +84,7 @@ async def create_employee(
         db_session=db_session,
     )
 
-    employee = Employee(user_id=user.id)
+    employee = Employee(id=user.id)
     db_session.add(employee)
     await db_session.commit()
     await db_session.refresh(employee)

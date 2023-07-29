@@ -1,3 +1,4 @@
+from datetime import datetime
 from os import getenv
 
 from dotenv import load_dotenv
@@ -5,11 +6,20 @@ from sqlmodel import SQLModel, Field
 
 load_dotenv("src/config/.env")
 
-ROLES = getenv("ROLES")
+ROLES = getenv("ROLES", None).split(",")
 CUSTOMER_ROLE = ROLES[1]
 
 
-class User(SQLModel, table=True):
+class TimestampMixin(SQLModel):
+    created_at: datetime = Field(default=datetime.now(), nullable=False)
+    updated_at: datetime = Field(
+        default=datetime.now(),
+        schema_extra={"onupdate": datetime.now()},
+        nullable=False,
+    )
+
+
+class User(TimestampMixin, table=True):
     id: int | None = Field(nullable=False, default=None, primary_key=True, index=True)
     username: str = Field(unique=True)
     hashed_password: str | None = Field(nullable=False)
@@ -30,10 +40,10 @@ class Address(SQLModel, table=True):
 
 
 class Customer(SQLModel, table=True):
-    user_id: int = Field(nullable=False, foreign_key="user.id", primary_key=True)
+    id: int = Field(nullable=False, foreign_key="user.id", primary_key=True)
     address_id: int | None = Field(nullable=True, foreign_key="address.id")
 
 
 class Employee(SQLModel, table=True):
-    user_id: int = Field(nullable=False, foreign_key="user.id", primary_key=True)
+    id: int = Field(nullable=False, foreign_key="user.id", primary_key=True)
     job_title: str | None = Field(nullable=True)

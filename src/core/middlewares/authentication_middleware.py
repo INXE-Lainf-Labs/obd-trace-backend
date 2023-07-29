@@ -12,7 +12,7 @@ from src.core.models import User
 
 load_dotenv("src/config/.env")
 
-ROLES = getenv("ROLES")
+ROLES = getenv("ROLES").split(",")
 ADMIN_ROLE = ROLES[0]
 JWT_SECRET = getenv("JWT_SECRET")
 JWT_ALGORITHM = getenv("JWT_ALGORITHM")
@@ -61,7 +61,7 @@ async def check_authorization(authorization: str) -> bool:
 
     token = authorization.split()[1]
     token_user = await validate_token(token)
-    if token_user.role is not ADMIN_ROLE:
+    if token_user.role != ADMIN_ROLE:
         raise Forbidden()
 
     return True

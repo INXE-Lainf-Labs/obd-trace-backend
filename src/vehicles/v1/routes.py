@@ -7,10 +7,10 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.config.database.setup import get_db_session
 from src.core.middlewares.authentication_middleware import check_authorization
 from src.vehicles.schemas import (
-    ResponseVehicle,
+    VehicleResponse,
     Vehicle,
     CustomerVehicle,
-    ResponseCustomerVehicle,
+    CustomerVehicleResponse,
 )
 from src.vehicles.service import (
     get_vehicles,
@@ -23,14 +23,14 @@ from src.vehicles.service import (
 vehicles_v1_router = APIRouter(prefix="/v1/vehicles")
 
 
-@vehicles_v1_router.get("/", response_model=list[ResponseVehicle])
+@vehicles_v1_router.get("/", response_model=list[VehicleResponse])
 async def list_vehicles(
     db_session: AsyncSession = Depends(get_db_session),
 ):
     return await get_vehicles(db_session)
 
 
-@vehicles_v1_router.get("/{vehicle_id}/", response_model=ResponseVehicle)
+@vehicles_v1_router.get("/{vehicle_id}/", response_model=VehicleResponse)
 async def get_vehicle(
     vehicle_id: Annotated[int, Path(title="The ID of the vehicle", ge=0, le=10000)],
     db_session: AsyncSession = Depends(get_db_session),
@@ -40,7 +40,7 @@ async def get_vehicle(
 
 @vehicles_v1_router.post(
     "/",
-    response_model=ResponseVehicle,
+    response_model=VehicleResponse,
     status_code=HTTPStatus.CREATED,
 )
 async def post_vehicle(
@@ -62,7 +62,7 @@ async def post_vehicle(
 
 @vehicles_v1_router.post(
     "/customer/{vehicle_id}",
-    response_model=ResponseCustomerVehicle,
+    response_model=CustomerVehicleResponse,
     status_code=HTTPStatus.CREATED,
     summary="Create a Customer relation to an existent Vehicle",
 )
@@ -77,7 +77,7 @@ async def post_customer_vehicle(
         new_customer_vehicle = await create_customer_vehicle(
             vin=customer_vehicle.vin,
             plate_code=customer_vehicle.plate_code,
-            user_id=customer_vehicle.customer_id,
+            customer_id=customer_vehicle.customer_id,
             vehicle_id=vehicle_id,
             db_session=db_session,
         )
@@ -86,7 +86,7 @@ async def post_customer_vehicle(
 
 @vehicles_v1_router.post(
     "/customer/",
-    response_model=ResponseCustomerVehicle,
+    response_model=CustomerVehicleResponse,
     status_code=HTTPStatus.CREATED,
     summary="Create a Customer relation to a new Vehicle",
 )
@@ -100,7 +100,7 @@ async def post_vehicle_and_customer_vehicle(
         new_customer_vehicle = await create_vehicle_and_customer_vehicle(
             vin=customer_vehicle.vin,
             plate_code=customer_vehicle.plate_code,
-            user_id=customer_vehicle.customer_id,
+            customer_id=customer_vehicle.customer_id,
             brand=customer_vehicle.brand,
             model=customer_vehicle.model,
             color=customer_vehicle.color,

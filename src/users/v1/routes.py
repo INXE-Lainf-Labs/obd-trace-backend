@@ -7,7 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config.database.setup import get_db_session
 from src.core.middlewares.authentication_middleware import check_authorization
-from src.users.schemas import NewCustomer, NewEmployee, ResponseUser
+from src.users.schemas import NewCustomer, NewEmployee, UserResponse
 from src.users.service import (
     get_users,
     create_customer,
@@ -17,7 +17,7 @@ from src.users.service import (
 users_v1_router = APIRouter(prefix="/v1/users")
 
 
-@users_v1_router.get("/", response_model=list[ResponseUser])
+@users_v1_router.get("/", response_model=list[UserResponse])
 async def list_users(
     authorization: Annotated[str | None, Header()] = None,
     db_session: AsyncSession = Depends(get_db_session),
