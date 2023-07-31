@@ -19,7 +19,9 @@ from src.services.services import (
 services_v1_router = APIRouter(prefix="/v1/services")
 
 
-@services_v1_router.get("/", response_model=list[Service], summary="Get all Services")
+@services_v1_router.get(
+    "/", response_model=list[ServiceResponse], summary="Get all Services"
+)
 async def list_services(
     db_session: AsyncSession = Depends(get_db_session),
 ):
@@ -28,7 +30,7 @@ async def list_services(
 
 @services_v1_router.get(
     "/{service_id}/",
-    response_model=Service,
+    response_model=ServiceResponse,
     summary="Get service details for a given id",
 )
 async def get_service(

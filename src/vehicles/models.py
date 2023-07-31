@@ -1,5 +1,7 @@
 from sqlmodel import SQLModel, Field
 
+from src.core.models import TimestampMixin
+
 
 class Vehicle(SQLModel, table=True):
     id: int | None = Field(unique=True, nullable=False, default=None, primary_key=True)
@@ -9,7 +11,7 @@ class Vehicle(SQLModel, table=True):
     year: str | None = Field(nullable=False, default=None)
 
 
-class CustomerVehicle(SQLModel, table=True):
+class CustomerVehicle(TimestampMixin, table=True):
     __tablename__ = "customer_vehicle"
     id: int | None = Field(
         unique=True, nullable=False, default=None, primary_key=True, index=True
