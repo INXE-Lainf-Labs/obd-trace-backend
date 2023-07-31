@@ -213,10 +213,9 @@ async def customer_vehicle_payload(customer):
 
 
 @pytest_asyncio.fixture
-async def customer_vehicle(db_session, vehicle, vehicle_payload, customer):
+async def customer_vehicle(db_session, vehicle, customer):
     test_customer = await customer()
     test_customer_vehicle = CustomerVehicle(
-        # customer_id=test_customer.id, vehicle_id=vehicle_payload["id"], plate_code=""
         customer_id=test_customer.id,
         vehicle_id=vehicle.id,
         plate_code="",
