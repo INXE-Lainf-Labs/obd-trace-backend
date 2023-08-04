@@ -11,6 +11,10 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import SQLModel
 
 # Import models here if using SQLite in development environment. Otherwise, use migration to set up the database.
+from src.core.models import User, Customer, Employee, Address
+from src.vehicles.models import Vehicle, CustomerVehicle
+from src.services.models import Service
+from src.orders.models import Order
 
 load_dotenv()
 SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", None)
