@@ -14,7 +14,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.auth.services import signin_user
 from src.config.database.setup import get_db_session
-from src.core.models import User
+from src.core.models import User, Customer, Address
 from src.main import app
 from src.orders.models import Order
 from src.services.models import Service
@@ -101,6 +101,28 @@ def user2_payload():
 
 
 @pytest.fixture
+def address_payload():
+    return {
+        "street": "Carlos Alameda 4952",
+        "city": "Rio de Janeiro",
+        "state": "RJ",
+        "complement": "BL 2 AP 305",
+        "zipcode": "07052427",
+    }
+
+
+@pytest.fixture
+def address_payload2():
+    return {
+        "street": "Anthony Rodovia 997",
+        "city": "Braga do Descoberto",
+        "state": "RJ",
+        "complement": "",
+        "zipcode": "38362663",
+    }
+
+
+@pytest.fixture
 def admin_payload():
     return {"username": "alex.doe@email.com", "password": "test789"}
 
@@ -114,6 +136,72 @@ def customer(db_session, user_payload):
         return customer
 
     return _customer
+
+
+@pytest_asyncio.fixture
+async def customers(
+    db_session, user_payload, user2_payload, address_payload, address_payload2
+):
+    customer1 = {
+        "username": user_payload["username"],
+        "password": user_payload["password"],
+        "first_name": "Robert",
+        "last_name": "Martin",
+        "is_active": True,
+        "role": CUSTOMER_ROLE,
+        "street": address_payload["street"],
+        "city": address_payload["city"],
+        "state": address_payload["state"],
+        "complement": address_payload["complement"],
+        "zipcode": address_payload["zipcode"],
+    }
+
+    customer2 = {
+        "username": user2_payload["username"],
+        "password": user2_payload["password"],
+        "first_name": "Alice",
+        "last_name": "Doe",
+        "is_active": True,
+        "role": CUSTOMER_ROLE,
+        "street": address_payload2["street"],
+        "city": address_payload2["city"],
+        "state": address_payload2["state"],
+        "complement": address_payload2["complement"],
+        "zipcode": address_payload2["zipcode"],
+    }
+
+    for customer in [customer1, customer2]:
+        password = customer["password"]
+        hashed_password = pbkdf2_sha512.hash(password)
+        user = User(
+            username=customer["username"],
+            first_name=customer["first_name"],
+            last_name=customer["last_name"],
+            hashed_password=hashed_password,
+            role=customer["role"],
+        )
+
+        db_session.add(user)
+        await db_session.commit()
+        await db_session.refresh(user)
+
+        address = Address(
+            street=customer["street"],
+            city=customer["city"],
+            state=customer["state"],
+            complement=customer["complement"],
+            zipcode=customer["zipcode"],
+        )
+
+        db_session.add(address)
+        await db_session.commit()
+        await db_session.refresh(address)
+
+        customer = Customer(id=user.id, address_id=address.id)
+
+        db_session.add(customer)
+
+    return customer1, customer2
 
 
 @pytest_asyncio.fixture

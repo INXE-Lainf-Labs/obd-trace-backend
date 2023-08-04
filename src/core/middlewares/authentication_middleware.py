@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt, ExpiredSignatureError
-from passlib.context import CryptContext
 
 from src.core.exceptions import Unauthorized, Forbidden
 from src.core.models import User
@@ -14,15 +13,12 @@ load_dotenv("src/config/.env")
 
 ROLES = getenv("ROLES").split(",")
 ADMIN_ROLE = ROLES[0]
+CUSTOMER_ROLE = ROLES[1]
 JWT_SECRET = getenv("JWT_SECRET")
 JWT_ALGORITHM = getenv("JWT_ALGORITHM")
 JWT_EXPIRATION_DAYS = getenv("JWT_EXPIRATION_DAYS")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-context = CryptContext(
-    schemes=["sha512_crypt"], deprecated="auto", default="sha512_crypt"
-)
 
 
 async def validate_token(access_token: str = Depends(oauth2_scheme)) -> User:
@@ -62,6 +58,19 @@ async def check_authorization(authorization: str) -> bool:
     token = authorization.split()[1]
     token_user = await validate_token(token)
     if token_user.role != ADMIN_ROLE:
+        raise Forbidden()
+
+    return True
+
+
+async def check_customer_authorization(authorization: str, user_id: int) -> bool:
+    if authorization is None:
+        raise Unauthorized()
+
+    token = authorization.split()[1]
+    token_user = await validate_token(token)
+
+    if token_user.role not in (ADMIN_ROLE, CUSTOMER_ROLE) or token_user.id != user_id:
         raise Forbidden()
 
     return True

@@ -6,12 +6,23 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config.database.setup import get_db_session
-from src.core.middlewares.authentication_middleware import check_authorization
-from src.users.schemas import NewCustomer, NewEmployee, UserResponse
+from src.core.middlewares.authentication_middleware import (
+    check_authorization,
+    check_customer_authorization,
+)
+from src.users.schemas import (
+    NewCustomer,
+    NewEmployee,
+    UserResponse,
+    UserUpdateRequest,
+    CustomerResponse,
+)
 from src.users.service import (
     get_users,
     create_customer,
     create_employee,
+    update_customer,
+    get_customers,
 )
 
 users_v1_router = APIRouter(prefix="/v1/users")
@@ -25,6 +36,17 @@ async def list_users(
     is_authorized = await check_authorization(authorization)
     if is_authorized:
         return await get_users(db_session)
+
+
+@users_v1_router.get("/customers/", response_model=list[CustomerResponse])
+async def list_customers(
+    authorization: Annotated[str | None, Header()] = None,
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    is_authorized = await check_authorization(authorization)
+    if is_authorized:
+        customers = await get_customers(db_session)
+        return customers
 
 
 @users_v1_router.post(
@@ -43,6 +65,31 @@ async def post_customer(
         customer = await create_customer(
             username=form_data.username,
             password=form_data.password,
+            db_session=db_session,
+        )
+        return customer
+
+
+@users_v1_router.put(
+    "/customer/{customer_id}/",
+    response_model=UserResponse,
+    status_code=HTTPStatus.OK,
+)
+async def put_customer(
+    customer_id: int,
+    body: UserUpdateRequest,
+    authorization: Annotated[str | None, Header()] = None,
+    db_session: AsyncSession = Depends(get_db_session),
+):
+    is_authorized = await check_customer_authorization(authorization, customer_id)
+    if is_authorized:
+        customer = await update_customer(
+            user_id=customer_id,
+            username=body.username,
+            password=body.password,
+            first_name=body.first_name,
+            last_name=body.last_name,
+            address=body.address,
             db_session=db_session,
         )
         return customer
