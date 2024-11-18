@@ -1,49 +1,115 @@
+# FastAPI Starter
+
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-FastAPI starter
+Este é um projeto de inicialização para aplicações FastAPI com suporte a Docker e Docker Compose. Abaixo estão as etapas para rodar o projeto facilmente com Docker.
 
-# Requirements
+## Requirements
 
-- Python (3.10.\*) [Installation](https://www.python.org/downloads/ "Installation")
-- docker-compose [Installation](https://docs.docker.com/compose/install/ "Installation")
-- Docker [Installation](https://docs.docker.com/desktop/mac/install/ "Installation")
+Para rodar este projeto, você precisará dos seguintes requisitos:
 
-## How to run
+- **Python (3.10.\*)**: [Instalar Python](https://www.python.org/downloads/)
+- **docker-compose**: [Instalar docker-compose](https://docs.docker.com/compose/install/)
+- **Docker**: [Instalar Docker](https://docs.docker.com/desktop/mac/install/)
 
-1. Clone this repository on a folder of your preference
-2. Rename the file located in `src/config/example.env` to `src/config/.env`
-3. On a terminal, go to the root project folder and execute `make docker-up`
+No entanto, **a maneira mais fácil de rodar este projeto é usando Docker**, que já contém todas as dependências e configurações necessárias.
 
-The application will be available at  [http://localhost:8000/](http://localhost:8000/)
+## Como rodar
 
-## Tests and lint
+Para rodar a aplicação usando Docker, siga estas etapas:
 
-First, start the containers:
-```bash
-$ make docker-up
-```
+1. **Clone o repositório para o diretório de sua escolha**:
+   ```bash
+   git clone https://github.com/your-repository.git
 
-Test the application:
-```bash
-make test
-```
+2. **Renomeie o arquivo de exemplo de variáveis de ambiente**:
+    ```bash
+    O arquivo src/config/example.env contém variáveis de ambiente padrão. Renomeie-o para .env para configurar o ambiente da aplicação.
 
-Show lint errors:
-```bash
-make lint
-```
+3. **Suba os containers Docker**:
 
-Try to fix lint errors:
-```bash
-make lint-fix
-```
+    Abra um terminal na pasta raiz do projeto e execute o comando abaixo. Ele irá subir os containers necessários para a aplicação.
+    ```bash
+    make docker-up
+    ```
+    O comando acima usará o docker-compose para configurar o ambiente completo, incluindo o backend e o banco de dados.
 
-## Install Black code formatter to your environment
+## Comandos úteis
 
-```bash
-$ make install-code-formatter
-```
+1. **Subir os containers Docker**:
+
+    Subir o Docker container principal:
+    ```bash
+    make docker-up
+    ```
+    Subir apenas o banco de dados em Docker:
+    ```bash
+    make docker-up-db
+    ```
+
+2. **Parar e limpar containers e imagens Docker**:
+
+    Parar os containers e remover imagens e volumes:
+    ```bash
+    make docker-prune
+    ```
+
+3. **Reiniciar os containers Docker**:
+
+    Limpa e sobe os containers novamente:
+    ```bash
+    make docker-reload
+    ```
+
+4. **Rodar testes da aplicação**:
+
+    Instalar as dependências de testes:
+    ```bash
+    make test
+    ```
+
+5. **Verificar erros de lint**:
+
+    Verificar se o código segue o padrão Black:
+    ```bash
+    make lint
+    ```
+
+6. **Corrigir erros de lint automaticamente**:
+
+    Parar os containers e remover imagens e volumes:
+    ```bash
+    make lint-fix
+    ```
+
+7. **Instalar o virtualenv**:
+
+    Caso queira rodar o projeto em um ambiente local sem Docker, você pode usar virtualenv. Para isso, execute o seguinte comando:
+    ```bash
+    python3 -m venv .venv
+    ```
+
+8. **Instalar os requirements**:
+
+    Após configurar o ambiente virtual, instale as dependências do projeto com o comando:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+9. **Corrigir erros de lint automaticamente**:
+
+    Parar os containers e remover imagens e volumes:
+    ```bash
+    make lint-fix
+    ```
+
+10. **Instalar o formatador de código Black no seu ambiente**:
+
+    Para instalar o Black para formatar o código no seu ambiente local, execute:
+    ```bash
+    make install-code-formatter
+    ```
 
 ## Documentation
 
-By default, fast API automatically documents all our routes and models at [http://localhost:8000/docs](http://localhost:8000/docs).
+O FastAPI gera automaticamente uma documentação interativa de todas as nossas rotas e modelos. Você pode acessá-la diretamente no seu navegador em http://localhost:8000/docs.
