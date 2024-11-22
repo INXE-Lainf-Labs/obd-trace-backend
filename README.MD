@@ -20,11 +20,11 @@ Para rodar a aplicação usando Docker, siga estas etapas:
 
 1. **Clone o repositório para o diretório de sua escolha**:
    ```bash
-   git clone https://github.com/your-repository.git
+   git clone https://github.com/INXE-Lainf-Labs/obd-trace-backend.git
 
 2. **Renomeie o arquivo de exemplo de variáveis de ambiente**:
     ```bash
-    O arquivo src/config/example.env contém variáveis de ambiente padrão. Renomeie-o para .env para configurar o ambiente da aplicação.
+    O arquivo src/config/.env.example contém variáveis de ambiente padrão. Renomeie-o para .env para configurar o ambiente da aplicação.
 
 3. **Suba os containers Docker**:
 
@@ -96,14 +96,9 @@ Para rodar a aplicação usando Docker, siga estas etapas:
     pip install -r requirements.txt
     ```
 
-9. **Corrigir erros de lint automaticamente**:
 
-    Parar os containers e remover imagens e volumes:
-    ```bash
-    make lint-fix
-    ```
 
-10. **Instalar o formatador de código Black no seu ambiente**:
+9. **Instalar o formatador de código Black no seu ambiente**:
 
     Para instalar o Black para formatar o código no seu ambiente local, execute:
     ```bash
