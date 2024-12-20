@@ -70,14 +70,14 @@ Para rodar a aplicação usando Docker, siga estas etapas:
 
 5. **Verificar erros de lint**:
 
-    Verificar se o código segue o padrão Black:
+    Verificar se o código está de acordo com as PEPs:
     ```bash
     make lint
     ```
 
 6. **Corrigir erros de lint automaticamente**:
 
-    Parar os containers e remover imagens e volumes:
+    Ajusta o código para seguir o style guide da PEP-8:
     ```bash
     make lint-fix
     ```
