@@ -21,10 +21,10 @@ docker-up:
 	docker-compose up
 
 docker-up-db:
-	docker-compose up db
+	docker compose up db
 
 docker-prune:
-	docker-compose down
+	docker compose down
 	docker rmi "$(notdir $(PWD))-backend" "$(notdir $(PWD))-backend-init"
 	docker volume rm "$(notdir $(PWD))_pg-data"
 
@@ -73,4 +73,4 @@ clean-migration:
 
 new-migration:
 	@alembic revision --autogenerate -m "$(MIGRATION_TITLE)"
-	@alembic upgrade head
+	@alembic upgrade head 
